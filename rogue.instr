@@ -1,0 +1,23 @@
+Movement                                                y  k  u
+        With SHIFT or CTRL to move until you hit         \ | /
+        an obstacle                                     h -+- l
+                                                         / | \
+        .        Rest                                   b  j  n
+        m <direction>    Move onto something without taking it
+        ,                Pick up item at your location.
+
+Command Keys
+s          search                    i                inventory
+f          fight                     F                fight (to the death)
+e          Eat                       q                Quaff
+r          Read a scroll             d                Drop
+P          Put on ring               R                Remove a ring
+CTRL-P     See previous message      >                Descend level
+<          Ascend level              )                List weapons
+]          List armour               =                List rings
+^          Identify trap             I                Short inventory
+T          Take off                  W                Wear armour
+w          Wield weapon              c                Call something a name
+z          Zap something             t<direction>     Throw something
+v          Version                   Q                Quit
+CTRL-A     Show average hit points   S                Save game
