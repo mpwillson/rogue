@@ -18,7 +18,7 @@
 #include "rogue.h"
 
 object *fight_monster = 0;
-boolean detect_monster;
+extern boolean detect_monster;
 char hit_message[80] = "";
 
 /* forward decls */
