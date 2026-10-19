@@ -23,7 +23,7 @@ char hit_message[80] = "";
 
 /* forward decls */
 void rogue_damage();
-int special_hit();
+void special_hit();
 int get_hit_chance();
 int get_weapon_damage();
 int get_damage();
