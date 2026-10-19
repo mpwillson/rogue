@@ -18,7 +18,12 @@
 #include "rogue.h"
 
 short write_failed = 0;
+#ifdef __EMSCRIPTEN__
+/* Suggested name in the save prompt; the working directory is /data. */
+char *save_file = "rogue.save";
+#else
 char *save_file = "";
+#endif /* __EMSCRIPTEN__ */
 
 extern boolean detect_monster;
 extern short cur_level, max_level;

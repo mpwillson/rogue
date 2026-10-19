@@ -17,7 +17,12 @@
 #include <string.h>
 #include "rogue.h"
 
+#ifdef __EMSCRIPTEN__
+/* Persistent IDBFS mount. */
+char *score_file = "/data/rogue.scores";
+#else
 char *score_file = "rogue.scores";
+#endif /* __EMSCRIPTEN__ */
 
 /*forward decls */
 void center();

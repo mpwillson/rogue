@@ -23,7 +23,12 @@ char *rest_file = 0;
 boolean cant_int = 0, did_int = 0, score_only, init_curses = 0;
 boolean save_is_interactive = 1;
 boolean ask_quit = 1, show_skull = 1;
+#ifdef __EMSCRIPTEN__
+/* Persistent IDBFS mount. */
+char *error_file = "/data/rogue.esave";
+#else
 char *error_file = "rogue.esave";
+#endif /* __EMSCRIPTEN__ */
 char *byebye_string = "Okay, bye bye!";
 
 /* forward decls */

@@ -9,7 +9,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef __EMSCRIPTEN__
+/* Preloaded from static/rogue.instr; the working directory is /data. */
+static char *instructions="/rogue.instr";
+#else
 static char *instructions="rogue.instr";
+#endif /* __EMSCRIPTEN__ */
 
 void Instructions()
 {

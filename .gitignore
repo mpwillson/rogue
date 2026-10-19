@@ -1,2 +1,5 @@
 *.o
 rogue
+
+# native and Emscripten build trees
+/build/

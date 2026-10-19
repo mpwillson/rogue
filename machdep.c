@@ -69,6 +69,10 @@
 #include <pwd.h>
 #include "rogue.h"
 
+#ifdef __EMSCRIPTEN__
+#include "tui.h"
+#endif
+
 /* md_slurp:
  *
  * This routine throws away all keyboard input that has not
@@ -190,12 +194,20 @@ int
 md_get_file_id(fname)
 char *fname;
 {
+#ifdef __EMSCRIPTEN__
+	/* Inode numbers are not stable across IDBFS reloads. The original
+	 * code explicitly allows stubbing this check (see the comment above);
+	 * saved games live in browser-local storage anyway. */
+	(void) fname;
+	return(0);
+#else
 	struct stat sbuf;
 
 	if (stat(fname, &sbuf)) {
 		return(-1);
 	}
 	return((int) sbuf.st_ino);
+#endif /* __EMSCRIPTEN__ */
 }
 
 /* md_link_count():
@@ -320,10 +332,17 @@ char *fname;
 char *
 md_gln()
 {
+#ifdef __EMSCRIPTEN__
+    char *name = getenv("USER");
+
+    /* There is no passwd database in the browser. */
+    return(name ? name : "player");
+#else
     struct passwd *pw;
     
     pw = getpwuid(geteuid());
     return pw->pw_name;
+#endif /* __EMSCRIPTEN__ */
 }
 
 /* md_sleep:
@@ -339,7 +358,14 @@ void
 md_sleep(nsecs)
 int nsecs;
 {
+#ifdef __EMSCRIPTEN__
+	/* Yield to the browser so terminal output is flushed. */
+	if (nsecs > 0) {
+		delay_output(nsecs * 1000);
+	}
+#else
 	(void) sleep(nsecs);
+#endif /* __EMSCRIPTEN__ */
 }
 
 /* md_getenv()
@@ -428,7 +454,15 @@ int n;
 int
 md_gseed()
 {
+#ifdef __EMSCRIPTEN__
+	struct timeval tv;
+
+	/* getpid() is a constant in the browser; use the wall clock. */
+	gettimeofday(&tv, NULL);
+	return((int) (tv.tv_sec ^ tv.tv_usec));
+#else
 	return(getpid());
+#endif /* __EMSCRIPTEN__ */
 }
 
 /* md_exit():
@@ -522,7 +556,14 @@ boolean on;
 char *
 md_gdtcf()
 {
+#if defined(ROGUE_TERMCAP)
+	return(ROGUE_TERMCAP);
+#elif defined(__EMSCRIPTEN__)
+	/* Preloaded from static/rogue.termcap. */
+	return("/rogue.termcap");
+#else
 	return("/etc/termcap");
+#endif
 }
 
 /* md_tstp():

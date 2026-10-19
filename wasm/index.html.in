@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@UTW_TITLE@</title>
+    <link rel="stylesheet" href="./xterm.css" />
+    <style>
+      :root{color-scheme:dark}body{background:#0c0c0c;color:#ccc;font-family:monospace;margin:0;display:flex;flex-direction:column;align-items:center;min-height:100vh}header{text-align:center;padding:12px 16px 4px}header h1{font-size:16px;margin:0 0 4px;font-weight:normal}#name-row{font-size:11px;color:#666;margin-top:2px}#player-name{background:transparent;color:#999;border:0;border-bottom:1px solid #333;font:inherit;padding:0 2px;width:10em;text-align:center}#player-name:hover{border-bottom-color:#555}#player-name:focus{outline:none;border-bottom-color:#666;color:#ddd}#name-start{background:transparent;color:#8ab4f8;border:0;font:inherit;cursor:pointer;padding:0 0 0 4px}#name-start:hover{text-decoration:underline}#name-start:focus-visible{outline:1px solid #666}#terminal{border:1px solid #333;padding:4px;background:#000}#files{font-size:12px;color:#888;padding:8px 16px 0}#files a{color:#8ab4f8}#status{font-size:12px;color:#888;padding:8px 16px 16px;text-align:center;max-width:720px}
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>@UTW_TITLE@</h1>
+      <div id="name-row">
+        <label title="Used for high scores and saved-game identity">name:
+          <input id="player-name" maxlength="29" autocomplete="nickname"
+                 spellcheck="false" aria-label="Player name" />
+        </label>
+        <button id="name-start" type="button" hidden>start</button>
+      </div>
+    </header>
+    <div id="terminal"></div>
+    <div id="files"></div>
+    <div id="status"></div>
+    <script src="./xterm.js"></script>
+    <script type="module">
+      import { openpty } from "./xterm-pty.js";
+      import initEmscripten from "./@UTW_MODULE@";
+      import { createStorageManager } from "./storage.js";
+
+      const term = new Terminal({ cols: @UTW_COLS@, rows: @UTW_ROWS@ });
+      term.open(document.getElementById("terminal"));
+      term.element.addEventListener("click", () => {
+        (started ? term : nameInput).focus();
+      });
+
+      // The browser has no login name, so let the player choose the name
+      // Rogue uses for its greeting, save files and high-score table.
+      const nameInput = document.getElementById("player-name");
+      const startButton = document.getElementById("name-start");
+      const statusElement = document.getElementById("status");
+      const nameKey = "rogue.playerName";
+      const fallbackName = "player";
+      const namePrompt = "Choose a player name, then press start.";
+      let started = false;
+      const playerName = () =>
+        (nameInput.value.trim() || fallbackName).slice(0, 29);
+      const storeName = () => {
+        try {
+          localStorage.setItem(nameKey, playerName());
+        } catch (e) {}
+      };
+
+      let storedName = null;
+      try {
+        storedName = localStorage.getItem(nameKey);
+      } catch (e) {}
+      if (storedName && storedName.trim()) {
+        nameInput.value = storedName;
+      } else {
+        // First visit: do not start the game until the name is confirmed.
+        nameInput.value = fallbackName;
+        startButton.hidden = false;
+        statusElement.textContent = namePrompt;
+        nameInput.focus();
+        nameInput.select();
+      }
+      nameInput.addEventListener("input", storeName);
+      nameInput.addEventListener("change", () => {
+        nameInput.value = playerName();
+      });
+
+      // PTY layer between xterm.js and the Emscripten program: line
+      // discipline, termios ioctls, window size and Ctrl+C handling.
+      const { master: leader, slave: follower } = openpty();
+      term.loadAddon(leader);
+
+      // xterm.js hardcodes DEL (0x7f) for a plain Backspace. Its
+      // maintainers recommend this handler for custom keymaps
+      // (xtermjs/xterm.js#4278): send ^H, which Rogue's line editor
+      // understands. Ctrl/Alt/Meta combinations are left to xterm.js.
+      term.attachCustomKeyEventHandler((event) => {
+        if (event.key !== "Backspace" && event.keyCode !== 8) return true;
+        if (event.ctrlKey || event.altKey || event.metaKey || event.isComposing) {
+          return true;
+        }
+        if (event.type === "keyup") return true;
+        if (event.type === "keydown") {
+          term.input("\b");
+        }
+        return false;
+      });
+
+      const storage = createStorageManager({
+        filesElement: document.getElementById("files"),
+        statusElement,
+        // Rogue's internal files are not saved games.
+        hiddenFiles: ["rogue.scores", "rogue.screen", "rogue.esave"],
+        linkFor: (raw) => "#restore=" + encodeURIComponent(raw),
+      });
+
+      // A save link in the file list reloads the page with #restore=<name>.
+      // The game takes the save file name as its single command-line
+      // argument and restores it instead of starting a new dungeon. A hash
+      // is client-only, so the filename is not sent to the server.
+      const restore = new URLSearchParams(location.hash.slice(1)).get("restore");
+      const gameArguments = restore ? ["/data/" + restore] : [];
+
+      // A hash change alone does not reload the page; the previous module is
+      // already gone, so reload to start a fresh one.
+      window.addEventListener("hashchange", () => {
+        if (new URLSearchParams(location.hash.slice(1)).get("restore")) {
+          location.reload();
+        }
+      });
+
+      const begin = async () => {
+        if (started) return;
+        started = true;
+        startButton.hidden = true;
+        storeName();
+        if (statusElement.textContent === namePrompt) {
+          statusElement.textContent = "";
+        }
+        term.focus();
+
+        try {
+          const program = await initEmscripten(storage.options({
+            pty: follower,
+            persist: @UTW_PERSIST_JS@,
+            persistDir: "@UTW_PERSIST_DIR@",
+            arguments: gameArguments,
+            playerName: playerName(),
+          }));
+          storage.attach(program);
+          term.focus();
+
+          // Restoring consumes the save file, so the restore request is
+          // one-shot: drop it from the URL to make a later reload start a new
+          // game instead of trying to restore the same file again.
+          if (restore) {
+            try {
+              const url = new URL(location.href);
+              url.hash = "";
+              history.replaceState(null, "", url.pathname + url.search);
+            } catch (e) {
+              console.warn("could not clear the restore parameter:", e);
+            }
+          }
+        } catch (e) {
+          storage.fail(e);
+        }
+      };
+
+      startButton.addEventListener("click", begin);
+      nameInput.addEventListener("keydown", (e) => {
+        if (!started && e.key === "Enter") {
+          e.preventDefault();
+          begin();
+        }
+      });
+
+      if (storedName && storedName.trim()) {
+        begin();
+      }
+    </script>
+  </body>
+</html>
