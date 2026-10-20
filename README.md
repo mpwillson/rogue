@@ -12,7 +12,7 @@ so the native and browser builds share one code path.
 # On a fresh clone, initialize the pinned runtime submodule.
 git submodule update --init --recursive
 
-# Install/activate the pinned Emscripten (currently 6.0.12).
+# Install/activate the pinned Emscripten (currently 6.0.13).
 source /path/to/emsdk/emsdk_env.sh
 ./wasm/build-wasm.sh
 cd build/web && python3 -m http.server 8000   # open http://localhost:8000/
