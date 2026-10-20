@@ -24,31 +24,21 @@ int true_uid= -1;
 void
 turn_into_games()
 {
-#ifdef __EMSCRIPTEN__
-	/* No setuid() in the browser. */
-	return;
-#else
 	if(setuid(saved_uid)==-1)
 	{
 		perror("setuid(restore)");
 		clean_up("");
 	}
-#endif /* __EMSCRIPTEN__ */
 }
 
 void
 turn_into_user()
 {
-#ifdef __EMSCRIPTEN__
-	/* No setuid() in the browser. */
-	return;
-#else
 	if(setuid(true_uid)==-1)
 	{
 		perror("setuid(restore)");
 		clean_up("");
 	}
-#endif /* __EMSCRIPTEN__ */
 }
 
 int
@@ -56,11 +46,9 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-#ifndef __EMSCRIPTEN__
 	/* Save the setuid we have got, then turn back into the player */
 	saved_uid=geteuid();
 	setuid(true_uid=getuid());
-#endif /* __EMSCRIPTEN__ */
 
 	if (init(argc, argv)) {		/* restored game */
 		goto PL;

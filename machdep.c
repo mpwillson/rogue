@@ -332,17 +332,10 @@ char *fname;
 char *
 md_gln()
 {
-#ifdef __EMSCRIPTEN__
-    char *name = getenv("USER");
-
-    /* There is no passwd database in the browser. */
-    return(name ? name : "player");
-#else
     struct passwd *pw;
     
     pw = getpwuid(geteuid());
     return pw->pw_name;
-#endif /* __EMSCRIPTEN__ */
 }
 
 /* md_sleep:
