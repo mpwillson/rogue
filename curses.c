@@ -581,6 +581,7 @@ char **tcstr;
 		clean_up("cannot alloc() memory");
 	}
 	strncpy(*tcstr, obuf, j);
+	(*tcstr)[j] = 0;
 }
 
 void
