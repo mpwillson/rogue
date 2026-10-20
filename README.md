@@ -1,46 +1,12 @@
 # Rogue 9.8.6 - version 9.8.5 ported to modern compiler/OS
 
-## WebAssembly (browser) port
+Date: 2026-10-20
 
-This branch adds a browser port built with Emscripten, using the
-`unix-tui-to-wasm` runtime (xterm.js + xterm-pty, IDBFS persistence and the
-termcap shim), included as the `external/unix-tui-to-wasm` submodule.
-Rogue's own termcap-based curses implementation is used on every platform,
-so the native and browser builds share one code path.
+## Adding WebAssembly (browser) port
 
-```sh
-# On a fresh clone, initialize the pinned runtime submodule.
-git submodule update --init --recursive
-
-# Install/activate the pinned Emscripten (currently 6.0.13).
-source /path/to/emsdk/emsdk_env.sh
-./wasm/build-wasm.sh
-cd build/web && python3 -m http.server 8000   # open http://localhost:8000/
-```
-
-To use a different Emscripten version, set `ALLOW_UNTESTED_EMSDK=1`; the
-build script will warn and continue.
-
-The read-only data files (`wasm/rogue.termcap` and the original `rogue.instr`) are
-preloaded at the virtual filesystem root. The working directory is the IDBFS
-mount `/data`, so score files and saved games survive a page reload. Press
-`S` to save; the default name is `rogue.save`. After the game exits, saved
-games are listed below the terminal and can be clicked to reload the page
-with `#restore=<name>`. The small `name` field above the terminal sets the
-name used for high scores and saved-game identity. On the first visit the
-game waits for you to confirm it; afterwards it is remembered in browser
-local storage.
-
-Native sanity build (no ncurses needed):
-
-```sh
-cmake -S . -B build/native
-cmake --build build/native
-TERMCAP=wasm/rogue.termcap TERM=xterm ./build/native/rogue
-```
-
-The browser bundle is staged in `build/web`; both build trees are ignored by
-git.
+Rogue can now run in a web browser! Compile to WebAssembly with
+Emscripten and show it in a terminal emulator on the web. See
+[wasm/README.md](wasm/README.md) for build instructions.
 
 Date: 2020-03-04
 
