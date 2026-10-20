@@ -10,7 +10,7 @@
 #include <string.h>
 
 #ifdef __EMSCRIPTEN__
-/* Preloaded from static/rogue.instr; the working directory is /data. */
+/* Preloaded from rogue.instr (see CMakeLists.txt); the working directory is /data. */
 static char *instructions="/rogue.instr";
 #else
 static char *instructions="rogue.instr";

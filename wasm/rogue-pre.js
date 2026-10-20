@@ -15,6 +15,9 @@ Module["preRun"].push(function () {
   if (typeof ENV !== "undefined") {
     ENV.USER = Module["playerName"] || "player";
     ENV.LOGNAME = ENV.USER;
+    // Rogue's curses reads the termcap file named by $TERMCAP (max 40
+    // characters) before falling back to /etc/termcap.
+    ENV.TERMCAP = "/rogue.termcap";
   }
 
   // The template creates this directory before mounting IDBFS; create it

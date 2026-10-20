@@ -34,7 +34,18 @@ if(EMSCRIPTEN)
   set(UTW_PERSIST_DIR "/data")
   # rogue.termcap and rogue.instr are read-only and stay at the FS root;
   # scores and saved games are written to the persistent /data mount.
-  set(UTW_PRELOAD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/static")
+  # The preload directory is generated so rogue.instr is not duplicated:
+  # it is taken from the original and converted from CRLF to LF.
+  set(ROGUE_PRELOAD "${CMAKE_BINARY_DIR}/preload")
+  file(MAKE_DIRECTORY "${ROGUE_PRELOAD}")
+  file(READ "${CMAKE_CURRENT_SOURCE_DIR}/rogue.instr" _instr)
+  string(REPLACE "\r\n" "\n" _instr "${_instr}")
+  file(WRITE "${ROGUE_PRELOAD}/rogue.instr" "${_instr}")
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/wasm/rogue.termcap"
+                 "${ROGUE_PRELOAD}/rogue.termcap" COPYONLY)
+  set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+               "${CMAKE_CURRENT_SOURCE_DIR}/rogue.instr")
+  set(UTW_PRELOAD_DIR "${ROGUE_PRELOAD}")
   # Rogue customizes the page, storage manager and pre-js. UTW_WEB_FILES is
   # staged after the runtime's storage.js, replacing it in the bundle.
   set(UTW_PAGE "${CMAKE_CURRENT_SOURCE_DIR}/wasm/index.html.in")
@@ -43,9 +54,7 @@ if(EMSCRIPTEN)
 
   include("${UTW_ROOT}/utw.cmake")
   utw_enable(rogue)
-else()
-  # Native sanity build: use the termcap entry shipped with the sources
-  # instead of looking for /etc/termcap. Run with TERM=xterm.
-  target_compile_definitions(rogue PRIVATE
-    ROGUE_TERMCAP="${CMAKE_CURRENT_SOURCE_DIR}/static/rogue.termcap")
+  # Relink (and rebuild rogue.data) when the generated help file changes.
+  set_property(TARGET rogue APPEND PROPERTY LINK_DEPENDS
+               "${ROGUE_PRELOAD}/rogue.instr")
 endif()

@@ -21,7 +21,7 @@ cd build/web && python3 -m http.server 8000   # open http://localhost:8000/
 To use a different Emscripten version, set `ALLOW_UNTESTED_EMSDK=1`; the
 build script will warn and continue.
 
-The read-only data files (`static/rogue.termcap`, `static/rogue.instr`) are
+The read-only data files (`wasm/rogue.termcap` and the original `rogue.instr`) are
 preloaded at the virtual filesystem root. The working directory is the IDBFS
 mount `/data`, so score files and saved games survive a page reload. Press
 `S` to save; the default name is `rogue.save`. After the game exits, saved
@@ -36,7 +36,7 @@ Native sanity build (no ncurses needed):
 ```sh
 cmake -S . -B build/native
 cmake --build build/native
-TERM=xterm ./build/native/rogue
+TERMCAP=wasm/rogue.termcap TERM=xterm ./build/native/rogue
 ```
 
 The browser bundle is staged in `build/web`; both build trees are ignored by

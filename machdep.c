@@ -556,14 +556,7 @@ boolean on;
 char *
 md_gdtcf()
 {
-#if defined(ROGUE_TERMCAP)
-	return(ROGUE_TERMCAP);
-#elif defined(__EMSCRIPTEN__)
-	/* Preloaded from static/rogue.termcap. */
-	return("/rogue.termcap");
-#else
 	return("/etc/termcap");
-#endif
 }
 
 /* md_tstp():
