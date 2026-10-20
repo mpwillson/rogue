@@ -11,7 +11,6 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -57,11 +56,7 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-#ifdef __EMSCRIPTEN__
-	/* The browser has no login identity or setuid(). */
-	setenv("TERM", "xterm-256color", 1);
-	setenv("HOME", "/data", 1);
-#else
+#ifndef __EMSCRIPTEN__
 	/* Save the setuid we have got, then turn back into the player */
 	saved_uid=geteuid();
 	setuid(true_uid=getuid());

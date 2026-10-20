@@ -15,6 +15,11 @@ Module["preRun"].push(function () {
   if (typeof ENV !== "undefined") {
     ENV.USER = Module["playerName"] || "player";
     ENV.LOGNAME = ENV.USER;
+    // There is no login environment in the browser.
+    ENV.TERM = "xterm-256color";
+    ENV.HOME = "/data";
+    // Suggest a name in the save prompt (the "file name?" default is empty).
+    ENV.ROGUEOPTS = "file=rogue.save";
     // Rogue's curses reads the termcap file named by $TERMCAP (max 40
     // characters) before falling back to /etc/termcap.
     ENV.TERMCAP = "/rogue.termcap";
