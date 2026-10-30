@@ -6,6 +6,19 @@ Despite the version number referred to below, this source  was originally
 packaged in a tar file with the version number 985.  Hence, this is
 now rogue-9.8.6.
 
+## qwertz option
+
+Adding `qwertz` to the `ROGUEOPTS` environment variable swaps the `y` and
+`z` keys, so the diagonal movement keys `y`/`u`/`b`/`n` stay in their
+usual places on a German (QWERTZ) keyboard:
+
+    ROGUEOPTS=qwertz rogue
+
+The key labelled `Z` then moves up-left, `Shift-Z` runs up-left and `Y`
+zaps a wand. The swap applies to commands and direction prompts only;
+names, object letters and yes/no answers are taken as typed. `Ctrl-Z`
+reaches the game only if the terminal does not use it for job control.
+
 ## Changes to 9.8.5 version
 
 Ported to Debian Linux under WSL (GCC 8.3) and FreeBSD 12.x (clang 8.0.1)

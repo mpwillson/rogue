@@ -161,7 +161,7 @@ id_trap()
 
 	message("direction? ", 0);
 
-	while (!is_direction(dir = rgetchar())) {
+	while (!is_direction(dir = rgetcmd())) {
 		sound_bell();
 	}
 	check_message();

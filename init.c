@@ -23,6 +23,7 @@ char *rest_file = 0;
 boolean cant_int = 0, did_int = 0, score_only, init_curses = 0;
 boolean save_is_interactive = 1;
 boolean ask_quit = 1, show_skull = 1;
+boolean qwertz = 0;
 char *error_file = "rogue.esave";
 char *byebye_string = "Okay, bye bye!";
 
@@ -249,6 +250,8 @@ do_opts()
 			} else if (!strncmp(eptr, "name=", 5)) {
 				eptr += 5;
 				env_get_value(&nick_name, eptr, 0);
+			} else if (!strncmp(eptr, "qwertz", 6)) {
+				qwertz = 1;
 			} else if (!strncmp(eptr, "noaskquit", 9)) {
 				ask_quit = 0;
 			} else if (!strncmp(eptr, "noskull", 5) ||
