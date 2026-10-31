@@ -34,7 +34,7 @@ throw()
 	short dir, row, col;
 	object *monster;
 
-	while (!is_direction(dir = rgetchar())) {
+	while (!is_direction(dir = rgetcmd())) {
 		sound_bell();
 		if (first_miss) {
 			message("direction? ", 0);

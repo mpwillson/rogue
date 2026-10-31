@@ -41,7 +41,7 @@ play_level()
 		move(rogue.row, rogue.col);
 		refresh();
 
-		ch = rgetchar();
+		ch = rgetcmd();
 		check_message();
 		count = 0;
 CH:
@@ -181,7 +181,7 @@ CH:
 				if (count < 100) {
 					count = (10 * count) + (ch - '0');
 				}
-				ch = rgetchar();
+				ch = rgetcmd();
 			} while (is_digit(ch));
 			if (ch != CANCEL) {
 				goto CH;

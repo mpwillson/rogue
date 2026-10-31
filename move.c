@@ -287,7 +287,7 @@ move_onto()
 	short ch;
 	boolean first_miss = 1;
 
-	while (!is_direction(ch = rgetchar())) {
+	while (!is_direction(ch = rgetcmd())) {
 		sound_bell();
 		if (first_miss) {
 			message("direction? ", 0);

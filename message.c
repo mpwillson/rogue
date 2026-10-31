@@ -171,6 +171,34 @@ rgetchar()
 		}
 	}
 }
+
+/* rgetcmd:
+ *
+ * Read a command or direction key.  With the "qwertz" option, the y and z
+ * keys (and their shifted and control forms) are swapped so that the
+ * movement keys keep their QWERTY positions on a German keyboard.  Text,
+ * object letters and yes/no answers are read with rgetchar() and taken
+ * as typed.
+ */
+
+int
+rgetcmd()
+{
+	extern boolean qwertz;
+	int ch = rgetchar();
+
+	if (qwertz) {
+		switch(ch) {
+		case 'y': return('z');
+		case 'z': return('y');
+		case 'Y': return('Z');
+		case 'Z': return('Y');
+		case '\031': return('\032');
+		case '\032': return('\031');
+		}
+	}
+	return(ch);
+}
 /*
 Level: 99 Gold: 999999 Hp: 999(999) Str: 99(99) Arm: 99 Exp: 21/10000000 Hungry
 0    5    1    5    2    5    3    5    4    5    5    5    6    5    7    5

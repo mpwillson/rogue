@@ -432,6 +432,7 @@ int coin_toss();
 void message();
 void print_stats();
 int rgetchar();
+int rgetcmd();
 void sound_bell();
 void check_message();
 int r_index();

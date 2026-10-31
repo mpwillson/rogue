@@ -322,7 +322,7 @@ boolean to_the_death;
 	short possible_damage;
 	object *monster;
 
-	while (!is_direction(ch = rgetchar())) {
+	while (!is_direction(ch = rgetcmd())) {
 		sound_bell();
 		if (first_miss) {
 			message("direction?", 0);
