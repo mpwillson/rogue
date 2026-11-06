@@ -1,12 +1,15 @@
 # Rogue 9.8.6 - version 9.8.5 ported to modern compiler/OS
 
-Date: 2020-03-04
 
-Despite the version number referred to below, this source  was originally
-packaged in a tar file with the version number 985.  Hence, this is
-now rogue-9.8.6.
+## Date: 2026-11-05
 
-## qwertz option
+### Browser-based play option
+
+Sven Neuhaus has implemented a [Wasm version of rogue
+9.8.6](https://github.com/neuhaus/rogue-wasm). Play it
+[here](https://neuhaus.github.io/rogue/).
+
+### qwertz option
 
 Adding `qwertz` to the `ROGUEOPTS` environment variable swaps the `y` and
 `z` keys, so the diagonal movement keys `y`/`u`/`b`/`n` stay in their
@@ -19,7 +22,13 @@ zaps a wand. The swap applies to commands and direction prompts only;
 names, object letters and yes/no answers are taken as typed. `Ctrl-Z`
 reaches the game only if the terminal does not use it for job control.
 
-## Changes to 9.8.5 version
+## Date: 2020-03-04
+
+Despite the version number referred to below, this source  was originally
+packaged in a tar file with the version number 985.  Hence, this is
+now rogue-9.8.6.
+
+### Changes to 9.8.5 version
 
 Ported to Debian Linux under WSL (GCC 8.3) and FreeBSD 12.x (clang 8.0.1)
 
@@ -34,7 +43,7 @@ Ported to Debian Linux under WSL (GCC 8.3) and FreeBSD 12.x (clang 8.0.1)
           getlogin() under WSL returns NULL
 
   md_malloc: Remove declaration of malloc()
-  
+
 * Debian ncurses library header, <curses.h>, defines the macro CURSES,
   which conflicts with define for internal rogue curses
   implementation, therefore define for internal version of curses
@@ -74,10 +83,10 @@ Alan Cox [iiitac@pyr.swan.ac.uk]
 ## Original readme entries...
 ----
 I've ported this to LINUX..It seems to work fine.  I mostly
-POSIXized machdep.c and got rid of some floating point 
-arithmetic.  (Not a terribly difficult effort...)  This 
+POSIXized machdep.c and got rid of some floating point
+arithmetic.  (Not a terribly difficult effort...)  This
 is a first effort at dealing with the POSIX terminal I/O
-so it may not be perfect.  
+so it may not be perfect.
 
 I didn't add the patches to the original source code
 so I don't have the bug fixes added.  I used the original
